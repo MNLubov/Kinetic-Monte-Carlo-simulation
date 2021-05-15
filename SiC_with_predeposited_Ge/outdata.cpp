@@ -2,14 +2,17 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
-#include <graphics.h>
+#include "graphics.h"
 #include <math.h>
- 
+#include <istream>
+#include <fstream> 
+#include <ios>
 
 #include "mesh100.h"
 #include "global.h"
 #include "processes.h"
 #include "outdata.h"
+#include "impurity.h"
 
 FILE *output;
 
@@ -23,15 +26,14 @@ void out( void )
    //output of simulation box
    for(i=1; i<=totalatoms; i++)
       fprintf(output, "1  %f   %f   %f\n", toplayer[i][0], toplayer[i][1], toplayer[i][2]);  
-   for(i=1; i<=totalvacpos; i++)
-      fprintf(output, "5  %f   %f   %f\n", vacantpos[i][0], vacantpos[i][1], vacantpos[i][2]);  
+   //for(i=1; i<=totalvacpos; i++)
+     //fprintf(output, "5  %f   %f   %f\n", vacantpos[i][0], vacantpos[i][1], vacantpos[i][2]);  
    for(k = 1; k <= xcell * ycell * 2; k++)
    {
-     if(adsite[k] == 1)
-     {
+     if(adsite[k] == 1 && Impur[k] == 0)
         fprintf(output, "2  %f  %f  %f\n",adcoords[k][0],adcoords[k][1],adcoords[k][2]);
-        printf("Hello %d  %f  %f  %f\n",k, adcoords[k][0],adcoords[k][1],adcoords[k][2]);
-     }   
+     if(adsite[k] == 1 && Impur[k] == 1)   
+        fprintf(output, "3  %f  %f  %f\n",adcoords[k][0],adcoords[k][1],adcoords[k][2]);
    }
 
   fclose(output);
@@ -40,11 +42,7 @@ void out( void )
 
 void out1( double x, double y, double z )
 {
-  
-   
    fprintf(Diff, "2  %f  %f  %f\n",x,y,z);
-   
-  
 }   
 
 
@@ -111,13 +109,15 @@ void DegreeR( double check, double degree )
        
 }
 
-void OutStep( char timedata [8], double a[20000][3] )
+// Output of the system configuration each 
+void OutStep( void )
 {
    int i, j, k;
    char filename[11];
-   //string filename;
-   
-   FILE *F;
+     
+   //FILE *FOutStep;
+   std::fstream file;
+   FILE *f1;
    
    totalatoms = xcell * ycell * zcell * 8;
    for(i = 0; i < 3; i++)
@@ -134,19 +134,56 @@ void OutStep( char timedata [8], double a[20000][3] )
    totalatoms = 8 * xcell * ycell * zcell;
    //F = *filename;
    
-   F = fopen(filename,"w+");
-   //printf("check");
+   file.open(filename,std::ios::out);
+   f1 = fopen("f1","w+");
+   /* output of  the substrate */
+   
    for(i=1; i<=totalatoms; i++)
-      fprintf(F, "1  %f   %f   %f\n", toplayer[i][0], toplayer[i][1], toplayer[i][2]); 
-       
-   for(i = 0; i <= xcell*ycell*2; i++)
+   {
+      file<< "1   " << toplayer[i][0] << "  "<< toplayer[i][1] << "  "<< toplayer[i][2] << "\n";
+      //fprintf(f1, "1  %f   %f   %f\n", c);  
+      //fprintf(FOutStep, "1  %f   %f   %f\n", toplayer[i][0], toplayer[i][1], toplayer[i][2]);  
+   }   
+   
+   
+   for(i = 1; i <= xcell*ycell*2; i++)
    { 
          
-      if(adsite[i] == 1) 
-      {   
-        fprintf(F, "2  %f   %f   %f\n",adcoords[i][0],adcoords[i][1],adcoords[i][2] ); 
-      }  
+      if(adsite[i] == 1 && Impur[i] == 1)
+        file<< "3   " << adcoords[i][0] << "  "<< adcoords[i][1] << "  "<< adcoords[i][2] << "\n";
    }
+   
+   for(i = 1; i <= xcell*ycell*2; i++)
+   { 
+         
+      if(adsite[i] == 1 && Impur[i] == 0) 
+      {   
+        file<< "2   " << adcoords[i][0] << "  "<< adcoords[i][1] << "  "<< adcoords[i][2] << "\n";
+        //fprintf(f1, "2  %f   %f   %f\n",adcoords[i][0],adcoords[i][1],adcoords[i][2] ); 
+        //fprintf(FOutStep, "2  %f   %f   %f\n",adcoords[i][0],adcoords[i][1],adcoords[i][2] ); 
+      }  
      
-   fclose(F);
+   }
+   
+   
+     
+   //fclose(FOutStep);
+   fclose(f1);
+}
+
+//vyvod ASCII symvolov ot 1 do 100
+void AsciiOut ( void )
+{
+
+  int i;
+  FILE *symbols;
+  char c;
+  
+  symbols = fopen("symb","w+");
+  for(i = 1; i < 100; i++)
+  {
+    c = i;
+    fprintf(symbols,"%d  %c\n", i, c);
+  }
+  fclose(symbols);
 }

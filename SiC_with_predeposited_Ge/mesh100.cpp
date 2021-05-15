@@ -22,7 +22,7 @@ int zcell;
 double toplayer[80000][3];
 
 //coords of vacant positions
-double vacantpos[20000][3];
+double vacantpos[80000][3];
 
 //coords of elementar box
 double basis [9][3];
@@ -87,9 +87,7 @@ void MakeTopLayerCoords( int xcell, int ycell, int zcell )
    F = fopen("toplayer","w+");
    
    totalatoms = 8 * xcell * ycell * zcell;
-   //fprintf(F, "%d   \n", totalatoms);  
-   
-   
+
    BasisCoords();
    
    cell = 1;
@@ -107,9 +105,6 @@ void MakeTopLayerCoords( int xcell, int ycell, int zcell )
          } 
          cell++;
        }
-  
-   
-   
      
    for(i = 1; i <= totalatoms; i++)
    {

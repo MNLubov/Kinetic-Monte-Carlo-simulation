@@ -8,6 +8,7 @@
 #include "processes.h"
 #include "additional.h"
 #include "outdata.h"
+#include "impurity.h"
 
 // index of occuring process (deposition, diffusion of adatom, diffusion of atom with 1 neighbor e.t.c)
 int process;
@@ -47,27 +48,24 @@ void NeighborList( int atom_curr )
    if( cell_curr % ycell == 0)
    {
       ycell_number = ycell;
-      atomcell[atom_curr][1]=ycell_number;
+      
    }
    else
    {
       ycell_number = cell_curr % ycell;
-      atomcell[atom_curr][1]=ycell_number;
+      
    }
    if( cell_curr % xcell == 0)
    {
       xcell_number = cell_curr / xcell;
-      atomcell[atom_curr][0]=xcell_number;
+      
    }
    else
    {
       xcell_number = cell_curr / ycell + 1;
-      atomcell[atom_curr][0]=xcell_number;
+      
    }
-   //fprintf(F2, "%d  %d   %d\n", cell_curr, xcell_number, ycell_number);
    
-    //fprintf(F2, "%d  \n", atom_curr);
-  
    //postroenie of neighbor list
    //corner sites and edge sites have neighbors on the othe side of the simulation box 
    
@@ -278,7 +276,7 @@ void NeighborList( int atom_curr )
          Nextneigh[2] = atom_curr + 2;
        Nextneigh[3] = ycell_number * 2 - 1;    
        Nextneigh[4] = atom_curr - 2;
-      fprintf(ch,"%d  %d  %d  %d\n",Nextneigh[1], Nextneigh[2],Nextneigh[3],Nextneigh[4]);
+       //fprintf(ch,"%d  %d  %d  %d\n",Nextneigh[1], Nextneigh[2],Nextneigh[3],Nextneigh[4]);
       } 
       if( xcell_number != xcell && ycell_number != ycell)
       {
@@ -309,7 +307,7 @@ void NeighborList( int atom_curr )
 
 
 //deposition to first layer
-int Deposition( int xcell, int ycell, int zcell )
+int Deposition( int sort )
 {
    int i, j, k;
    int atom_number;
@@ -322,14 +320,10 @@ int Deposition( int xcell, int ycell, int zcell )
    numb = xcell*ycell*2;
    
   
-   //deposition
-   //fprintf(F1,"%d\n",rand());
-   atom_number = 1 + rand()% numb ; 
-   //printf("atom_number=%d\n",atom_number);
-  // printf("%d  %d  %d\n",atom_number,numb, adsite[atom_number]);
-      //fprintf(F,"%d   %d\n",atom_number, deposited[atom_number]);
-  
-   if( adsite[atom_number] == 0)// && vacantpos[atom_number][2] < ((zcell + 0.25)/2 + 0.0001) )
+   /* deposition */
+   atom_number = 1 + rand()% numb; 
+    
+   if( adsite[atom_number] == 0 )// && vacantpos[atom_number][2] < ((zcell + 0.25)/2 + 0.0001) )
    {
       adcoords[atom_number][0] = vacantpos[atom_number][0];
       adcoords[atom_number][1] = vacantpos[atom_number][1];
@@ -339,18 +333,25 @@ int Deposition( int xcell, int ycell, int zcell )
       //deposited[atom_number] = 1;
       adsite[atom_number] = 1;
       atom_counter++;
+      if( sort == 2 )
+      {
+        Impur[atom_number] = 1;
+        //printf("Impur=%d\n",atom_number);
+      }  
+      //if(sort == 1)
+       // printf("%d  %d\n",adsite[atom_number],atom_number);
+      //printf("atom_number=%d\n",atom_number);
       return atom_number;      
    } 
-   else
-     return 0;
-   //GroupList();
 
-   
+   if(adsite[atom_number] == 1)
+     return 0;
+  
 } 
 
 
-
-int Diffusion( int process_state )
+//calculation of the diffusion process
+int Diffusion( int process_state, int diff_sort )
 {
   int i, j, k;
   
@@ -359,6 +360,8 @@ int Diffusion( int process_state )
   int DiffAnumber;
   //number of the position of the atom after the hop
   int NewAnumber;
+  //direction of diffusion for atom with impurity neighbor
+  int ImpDiff;
   
     
   //number ofneighbors before and after the hop
@@ -367,36 +370,48 @@ int Diffusion( int process_state )
    //nahozhdenie svobodnyh napravlenij
    //updating adatom numbers of occupied adatom sites
    //adat_curr[ad_curr] = neighbor[direction];
-   
-   DiffAnumber = BondsNearest(process_state);   
-     
-   //choosing direction
-   directionDiff = 1 + rand()%jDir; //random number from 1 to 4;
-   //printf("directionDiff=%d\n",directionDiff);
-   //updating the global atom list
-   adsite[DiffAnumber] = 0; 
-   k = Diffdir[directionDiff];
-   //printf("k=%d\n",Diffdir[directionDiff]);
-   
-   if(process_state == 2 || process_state == 4 || process_state == 6 || process_state == 8) 
+   if(process_state >= 2 && process_state <= 8)
    {
-     adsite[BhopG[k]] = 1; 
-     adcoords[BhopG[k]][0] = vacantpos[BhopG[k]][0];
-     adcoords[BhopG[k]][1] = vacantpos[BhopG[k]][1];
-     adcoords[BhopG[k]][2] = vacantpos[BhopG[k]][2];
-     return BhopG[k];
+       DiffAnumber = BondsNearest(process_state);   
+         
+       //choosing direction
+       directionDiff = 1 + rand()%jDir; //random number from 1 to 4;
+       //printf("directionDiff=%d\n",directionDiff);
+       //updating the global atom list
+       adsite[DiffAnumber] = 0; 
+       k = Diffdir[directionDiff];
+       //printf("k=%d\n",Diffdir[directionDiff]);
+       
+       if(process_state == 2 || process_state == 4 || process_state == 6 || process_state == 8) 
+       {
+         adsite[BhopG[k]] = 1; 
+         adcoords[BhopG[k]][0] = vacantpos[BhopG[k]][0];
+         adcoords[BhopG[k]][1] = vacantpos[BhopG[k]][1];
+         adcoords[BhopG[k]][2] = vacantpos[BhopG[k]][2];
+         return BhopG[k];
+       }
+       
+       if(process_state == 3 || process_state == 5 || process_state == 7) 
+       {
+         adsite[BhopNG[k]] = 1; 
+         adcoords[BhopNG[k]][0] = vacantpos[BhopNG[k]][0];
+         adcoords[BhopNG[k]][1] = vacantpos[BhopNG[k]][1];
+         adcoords[BhopNG[k]][2] = vacantpos[BhopNG[k]][2];
+         return BhopNG[k];     
+       }  
    }
-   
-   if(process_state == 3 || process_state == 5 || process_state == 7) 
-   {
-     adsite[BhopNG[k]] = 1; 
-     adcoords[BhopNG[k]][0] = vacantpos[BhopNG[k]][0];
-     adcoords[BhopNG[k]][1] = vacantpos[BhopNG[k]][1];
-     adcoords[BhopNG[k]][2] = vacantpos[BhopNG[k]][2];
-     return BhopNG[k];     
-   }  
-   
   
+   if(process_state > 8 && process_state <= 20)
+   {
+    
+     ImpDiff = ImpBonds( process_state );
+     //printf("ImpDiff=%d\n",ImpDiff);
+     //getch();
+     adcoords[ImpDiff][0] = vacantpos[ImpDiff][0];
+     adcoords[ImpDiff][1] = vacantpos[ImpDiff][1];
+     adcoords[ImpDiff][2] = vacantpos[ImpDiff][2];
+     return ImpDiff;  
+   } 
  
   
  

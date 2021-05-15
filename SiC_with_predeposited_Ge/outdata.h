@@ -11,6 +11,9 @@ void out1( double x, double y, double z );
 
 void DegreeR( double check, double degree );
 
-void OutStep( char timedata [12], double a[20000][3]);
+void OutStep( void );
+
+//vyvod ASCII symvolov ot 1 do 100
+void AsciiOut ( void );
 
 #endif

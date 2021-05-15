@@ -11,7 +11,7 @@
 #define Debay  1.0E13
 
 //define deposition parameters
-#define deposition 1.0E14
+#define deposition 6.0E13
 
 
 

@@ -4,5 +4,7 @@
 
 void InitDone( void );
 
+void Random_Number_Generator_Test( void );
+
 
 #endif

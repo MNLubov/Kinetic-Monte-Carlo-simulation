@@ -23,7 +23,7 @@ extern double toplayer[80000][3];
 extern double basis [9][3];
 
 //coords of vacant positions
-extern double vacantpos[20000][3];
+extern double vacantpos[80000][3];
 
 //coords of elementar vacant box 
 extern double vacbasis[9][3];

@@ -27,9 +27,9 @@ extern double total_rate;
 //diffusion data file pointer
 extern FILE *Diff;
 
-int Deposition( int xcell, int ycell, int zcell );
+int Deposition( int sort );
 
-int Diffusion(  int process_state );
+int Diffusion(  int process_state, int diff_sort );
 
 void NeighborList( int atom_curr );
 

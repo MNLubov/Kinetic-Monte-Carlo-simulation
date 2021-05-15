@@ -7,21 +7,10 @@
 
 
 //occupied site coordinate
-extern double adcoords[20000][3];
+extern double adcoords[90000][3];
 
 //adatom coords
-extern double adatom_coords[20000][3];
-/*
-//atom with 1 neighbor coords
-double atom1_coords[20000][3];
-*/
-extern double attom1_coords[20000][3];
-
-//atom with 2 neighbor coords
-extern double atom2_coords[20000][3];
-
-//atom with 3 neighbor coords
-extern double atom3_coords[20000][3];
+extern double adatom_coords[90000][3];
 
 //current amount of deposited atoms
 extern int atom_counter;
@@ -42,7 +31,7 @@ extern int neighbor[5];
 extern int Nextneigh[5];
 
 //adatom sites
-extern int adsite[20000];
+extern int adsite[90000];
 
 //number of the cell 
 extern int cell_curr;
@@ -55,42 +44,27 @@ extern int global_counter;
 
 //groups of different atoms having nearest neighbors: adatoms, 1-bonded atomes, 2-bonded atoms, 3-bonded atoms 
 //adatom list
-extern int Adatom[20000];
+extern int Adatom[50000];
 //1-bonded atoms list
-extern int Atom1[20000];
+extern int Atom1[50000];
 //2-bonded atoms list
-extern int Atom2[20000];
+extern int Atom2[50000];
 //3-bonded atoms list
-extern int Atom3[20000];
+extern int Atom3[50000];
 // group of adatoms and atoms having next nearest neighbors
 //adatom list
-extern int AdatomN[20000];
+extern int AdatomN[50000];
 //1-bonded atoms list
-extern int Atom1N[20000];
+extern int Atom1N[50000];
 //2-bonded atoms list
-extern int Atom2N[20000];
+extern int Atom2N[50000];
 //3-bonded atoms list
-extern int Atom3N[20000];
+extern int Atom3N[50000];
 
 //schetchiki razlichnyh tipov atomov
 extern int adatom_k, atom1_k, atom2_k, atom3_k;
-//schetchiki atomov s ucheyom 'next nearest neighbors'
+//schetchiki atomov s ucheytom 'next nearest neighbors'
 extern int adatom_kN, atom1_kN, atom2_kN, atom3_kN;
-
-//number of nearest neighbors of each atom 0 - no neghbors, 1 - one neighbor and so on
-//extern int Aneigh[5];
-//number of next nearest neighbors of each atom
-extern int ANneigh[5];
-
-//number of the nearest neighbors after the hop
-//[i][][] -number of the site
-//[][i][], 0- not used, 1 - left up diag (nearest), 2 - right up diagonal (nearest), 3 - right down diagonal (nearest), 4 - left down diagonal (nearest),
-//5 - left horizontal (next nearest), 6 - vertical up (next nearest), 7 - right horizontal (next nearest), 8 - vertical down (next nearest),
-//[][][i] - number of the neighbors
-//extern int NeighHopDiff[20000][9][1];
-
-//number of atom with same number of neighbors before and after the hop
-//extern int Nsame[20000];
 
 //direction of diffusion
 extern int directionDiff;
@@ -101,21 +75,13 @@ extern int timedegree[20];
 // filename time values
 extern char timedata[8];
 
-
 //
 extern FILE *RateData, *F5;
 
 //group list function counter
 extern int grouplist_count;
 
-//massiv nomerov jacheek, v kotoroj raspolozhen atom
-extern int atomcell[1000][2];
-
-//atom-neighbors of the adatom 
-extern int atomN[20000][5];
-
-
-//sum cheking, in any functions
+/* sum cheking, in any functions */
 extern int sum_check;
 extern int cc;
 
@@ -152,5 +118,35 @@ extern int Diffdir[5];
 
 extern int ngh;
 
+//name of the system configuration output file
+extern char timedata[8];
+
+//direction of the hopto the next nearest position of atom with impurity neighbor
+extern int dirImp;
+
+//direction of the hop to the next nearest position of atom with impurity neighbor
+extern int dirImpN;
+
+//new atom position for diffusion of atom with impurity neighbor
+extern int newpos;
+
+//probability in the range [0,1]
+extern double prob;
+
+//number of the simulation step
+extern int count;
+
+
+//output file for 'int Rates(void)' function
+extern FILE *Frates;
+
+// rates of hops without keeping the number of neighbors including adatom hops rate 
+extern double r, r0, r1, r2, r3;
+// rates of hops with keeping the same number of nearest neighbors
+extern double r0N, r1N, r2N, r3N;
+// rates of hops to the nearest positions for atoms with impurity neighbors
+extern double rImp1, rImp2, rImp3, rImp1_1, rImp1_2, rImp2_1; 
+//rates of hops to the next nearest positions for atoms with impurity neighbors
+extern double rImp1N, rImp2N, rImp3N, rImp1_1N, rImp1_2N, rImp2_1N; 
 
 #endif
